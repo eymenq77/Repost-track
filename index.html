@@ -3,274 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- PWA Uygulama Desteği -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIldhdGNoRG9nIFJlcG9zdCBUcmFja2VyIiwKICAic2hvcnRfbmFtZSI6ICJXYXRjaERvZyIsCiAgInN0YXJ0X3VybCI6ICIvIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvcIjogIiMwZjBmMTIiLAogICJ0aGVtZV9jb2xvcIjogIjg4MmJlMiIKfQ==">
-    <title>WatchDog Repost Tracker</title>
-    
-    <!-- Firebase Veritabanı Kütüphaneleri -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+    <title>Repost Tracker</title>
     <style>
-        :root {
-            --bg: #0f0f12;
-            --card-bg: #1a1a24;
-            --accent: #8a2be2;
-            --accent-hover: #9d4edd;
-            --text: #ffffff;
-            --subtext: #a0a0b0;
-            --success: #00ffcc;
-        }
-
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            margin: 0;
-            padding: 20px;
+            background-color: #0f0f12;
+            color: #ffffff;
+            font-family: system-ui, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
+            padding: 15px;
             box-sizing: border-box;
         }
-
-        .container {
-            background: var(--card-bg);
+        .card {
+            background: #1a1a24;
             border: 1px solid #2a2a3c;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 20px;
             width: 100%;
-            max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 400px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-
-        h2 { margin-top: 0; color: var(--accent); font-size: 22px; text-align: center; }
-        p { color: var(--subtext); font-size: 14px; text-align: center; margin-bottom: 20px; }
-
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; color: var(--subtext); margin-bottom: 5px; }
-
+        h2 { color: #8a2be2; margin-top: 0; font-size: 20px; text-align: center; }
+        p { color: #a0a0b0; font-size: 13px; text-align: center; }
         input {
             width: 100%;
-            padding: 12px 14px;
-            border-radius: 8px;
-            border: 1px solid #33334d;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #333;
             background: #101018;
             color: #fff;
-            font-size: 14px;
             box-sizing: border-box;
-            outline: none;
         }
-
-        input:focus { border-color: var(--accent); }
-
         button {
             width: 100%;
             padding: 12px;
+            background: #8a2be2;
+            color: #fff;
             border: none;
-            border-radius: 8px;
-            background: var(--accent);
-            color: white;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 15px;
             cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover { background: var(--accent-hover); }
-
-        .hidden { display: none; }
-
-        .link-box {
-            background: #101018;
-            border: 1px dashed var(--accent);
-            padding: 10px;
-            border-radius: 8px;
-            word-break: break-all;
-            font-size: 13px;
-            color: var(--success);
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2a2a3c;
-            padding-bottom: 8px;
-            margin-top: 20px;
-        }
-
-        .log-list {
-            max-height: 250px;
-            overflow-y: auto;
             margin-top: 10px;
         }
-
-        .log-item {
-            background: #12121c;
-            border-left: 3px solid var(--accent);
+        .link-box {
+            background: #101018;
+            border: 1px dashed #00ffcc;
             padding: 10px;
             border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-
-        .log-item .time {
-            color: var(--success);
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .log-item .device {
-            color: var(--subtext);
+            color: #00ffcc;
             font-size: 11px;
+            word-break: break-all;
+            margin: 10px 0;
+            text-align: center;
         }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- 1. Ekran: Kurulum -->
-    <div class="container" id="step-setup">
-        <h2>WatchDog Tracker App</h2>
-        <p>Instagram takip sistemini başlatın.</p>
-        
-        <div class="input-group">
-            <label>Instagram Kullanıcı Adı</label>
-            <input type="text" id="username" placeholder="@kullanici_adi">
-        </div>
-
-        <div class="input-group">
-            <label>Yönlendirilecek Instagram Gönderisi / Repost Linki</label>
-            <input type="text" id="target-link" placeholder="https://instagram.com/p/...">
-        </div>
-
-        <button onclick="initTracker()">Uygulamayı Başlat ve Kur</button>
+    <div class="card" id="setup">
+        <h2>Link Oluşturucu</h2>
+        <p>Yönlendirilecek Instagram linkini girin:</p>
+        <input type="text" id="target" placeholder="https://instagram.com/p/..." value="https://instagram.com">
+        <button onclick="makeLink()">Takip Linki Üret</button>
     </div>
 
-    <!-- 2. Ekran: Canlı Takip Paneli -->
-    <div class="container hidden" id="step-dashboard">
-        <h2 id="user-title">@kullanici_adi Paneli</h2>
-        <p>Aşağıdaki bağlantıyı Instagram Repost/Hikayenizde paylaşın:</p>
-
-        <div class="link-box" id="generated-link">Link Üretiliyor...</div>
-
-        <div class="log-header">
-            <strong style="font-size: 14px;">Canlı Tıklama Akışı</strong>
-            <span style="font-size: 11px; color: var(--success);">● Veritabanı & Bildirim Aktif</span>
-        </div>
-
-        <div class="log-list" id="log-container">
-            <div style="text-align: center; color: var(--subtext); padding: 20px 0; font-size: 13px;" id="empty-msg">
-                Tıklama bekleniyor... Tıklayanların zaman bilgisi anında buraya düşecek.
-            </div>
-        </div>
+    <div class="card hidden" id="result">
+        <h2>Linkiniz Hazır!</h2>
+        <p>Bu linki kopyalayıp gönderin:</p>
+        <div class="link-box" id="final-link"></div>
+        <p style="font-size:11px; color:#ff4757;">⚠️ Linke tıklandığı an kesintisiz yönlendirme yapılacaktır.</p>
     </div>
 
     <script>
-        // Ücretsiz Firebase Veritabanı Yapılandırması
-        const firebaseConfig = {
-            databaseURL: "https://watchdog-tracker-default-rtdb.firebaseio.com"
-        };
-        
-        // Firebase Başlatma
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const database = firebase.database();
+        const params = new URLSearchParams(window.location.search);
+        const targetUrl = params.get('to');
 
-        let currentUsername = "";
-        let targetUrl = "https://instagram.com";
-
-        // Yönlendirme (Köprü) kontrolü: Biri linke tıkladıysa
-        const urlParams = new URLSearchParams(window.location.search);
-        const trackerUser = urlParams.get('r');
-        const redirectTarget = urlParams.get('go');
-
-        if (trackerUser) {
-            // SİTEYE TIKLAYAN KİŞİ BURAYA DÜŞER
-            const now = new Date();
-            const clickData = {
-                time: now.toLocaleTimeString('tr-TR'),
-                date: now.toLocaleDateString('tr-TR'),
-                device: navigator.userAgent.includes("Android") ? "Android Cihaz" : 
-                        navigator.userAgent.includes("iPhone") ? "iPhone / iOS" : "Masaüstü / Diğer"
-            };
-
-            // Veritabanına kaydet ve doğrudan Instagram'a fırlat
-            database.ref('clicks/' + trackerUser).push(clickData).then(() => {
-                window.location.href = redirectTarget ? decodeURIComponent(redirectTarget) : "https://instagram.com";
-            }).catch(() => {
-                window.location.href = "https://instagram.com";
-            });
-        }
-
-        // PANELİ BAŞLATMA (Uygulamayı Kullanan Kişi)
-        function initTracker() {
-            const user = document.getElementById("username").value.trim().replace("@", "");
-            const customLink = document.getElementById("target-link").value.trim();
-
-            if (!user) {
-                alert("Lütfen bir kullanıcı adı girin!");
-                return;
+        // BİRİ LİNKE TIKLADIĞINDA:
+        if (targetUrl) {
+            document.body.innerHTML = "<h3 style='color:white;text-align:center;'>Yönlendiriliyorsunuz...</h3>";
+            let destination = decodeURIComponent(targetUrl);
+            if (!destination.startsWith('http')) {
+                destination = 'https://' + destination;
             }
-
-            // Bildirim İzni İsteme
-            if ("Notification" in window && Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
-
-            currentUsername = user;
-            if (customLink) targetUrl = customLink;
-
-            document.getElementById("step-setup").classList.add("hidden");
-            document.getElementById("step-dashboard").classList.remove("hidden");
-            document.getElementById("user-title").innerText = "@" + currentUsername + " Paneli";
-
-            // Kullanıcıya özel izleme linki
-            const shareableLink = window.location.origin + window.location.pathname + 
-                                  "?r=" + encodeURIComponent(currentUsername) + 
-                                  "&go=" + encodeURIComponent(targetUrl);
-
-            document.getElementById("generated-link").innerText = shareableLink;
-
-            // Veritabanını Canlı Dinle (Tıklama Geldikçe Ekrana Bas ve Bildirim Gönder)
-            database.ref('clicks/' + currentUsername).on('child_added', (snapshot) => {
-                const data = snapshot.val();
-                
-                // 1. Ekran paneline log ekle
-                addLogToScreen(data.device, data.time, data.date);
-                
-                // 2. Sesli Bildirim Çal
-                try {
-                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-                    audio.play();
-                } catch(e) {}
-
-                // 3. Tablet Bildirim Paneline Düşür
-                if ("Notification" in window && Notification.permission === "granted") {
-                    new Notification("WatchDog Tracker", {
-                        body: `Yeni tıklama yakalandı! Saat: ${data.time} (${data.device})`
-                    });
-                }
-            });
+            // Bekletmeden anında yönlendir
+            window.location.href = destination;
         }
 
-        function addLogToScreen(device, time, date) {
-            const emptyMsg = document.getElementById("empty-msg");
-            if (emptyMsg) emptyMsg.remove();
+        // KENDİN LİNK ÜRETİRKEN:
+        function makeLink() {
+            let inputUrl = document.getElementById('target').value.trim();
+            if (!inputUrl) inputUrl = "https://instagram.com";
 
-            const logContainer = document.getElementById("log-container");
-            const item = document.createElement("div");
-            item.className = "log-item";
-            item.innerHTML = `
-                <div><strong>Erişim Yakalandı</strong></div>
-                <div class="device">Cihaz: ${device}</div>
-                <div class="time">Saat/Dakika: ${time} (${date})</div>
-            `;
-            logContainer.prepend(item);
+            const baseUrl = window.location.origin + window.location.pathname;
+            const createdLink = baseUrl + "?to=" + encodeURIComponent(inputUrl);
+
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('final-link').innerText = createdLink;
         }
     </script>
 </body>
